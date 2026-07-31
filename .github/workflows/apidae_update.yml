@@ -1,4 +1,4 @@
-name: Actualisation Donnees Apidae
+name: Actualisation Donnees Apidae MULTI
 
 on:
   schedule:
@@ -20,7 +20,7 @@ jobs:
       - name: Installation des dependances
         run: pip install requests
 
-      - name: Execution du script de conversion
+      - name: Execution du script de conversion multi-selections
         env:
           APIDAE_API_KEY: ${{ secrets.APIDAE_API_KEY }}
           APIDAE_PROJECT_ID: ${{ secrets.APIDAE_PROJECT_ID }}
@@ -31,88 +31,74 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL v002 officielle de l'API de consultation de diffusion
-          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
-          
-          # Structure technique stricte exigée en v002 : l'authentification s'imbrique obligatoirement DANS la query
-          query_structure = {
-              'apiKey': api_key,
-              'projetId': int(project_id) if project_id.isdigit() else project_id,
-              'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
-              'count': 600
+          # ==========================================
+          # ⚠️ REMPLACEZ LES NUMÉROS CI-DESSOUS PAR VOS VRAIS NUMÉROS APIDAE
+          # ==========================================
+          selections = {
+              'categorie_1': 188585,  # Mettez le 1er numéro de sélection à la place de 111111
+              'categorie_2': 188586,  # Mettez le 2ème numéro de sélection à la place de 222222
+              'categorie_3': 188587,  # ...
+              'categorie_4': 188589,
+              'categorie_5': 188593,
+              'categorie_6': 188594
           }
           
-          params = {
-              'query': json.dumps(query_structure)
-          }
+          url = 'https://apidae-tourisme.com'
+          headers = {'User-Agent': 'Mozilla/5.0'}
           
-          # En-tête de sécurité pour imiter un navigateur réel et éviter le blocage de la passerelle OpenResty
-          headers = {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          }
-          
-          try:
-              # Appel en méthode GET pure avec en-têtes appropriés
-              response = requests.get(url, params=params, headers=headers, timeout=45)
-              response.raise_for_status()
-              data = response.json()
-          except Exception as e:
-              print('--- ERREUR DURANT L APPEL APIDAE ---')
-              if 'response' in locals():
-                  print(f'Code serveur : {response.status_code}')
-                  print(f'Contenu renvoye : {response.text[:500]}')
-              else:
-                  print(f'Erreur : {e}')
-              exit(1)
-          
-          geojson = {
-              'type': 'FeatureCollection',
-              'features': []
-          }
-          
-          objets = data.get('objetsTouristiques', [])
-          if not objets and 'members' in data:
-              objets = data.get('members', [])
+          # Le script va boucler sur vos 6 sélections
+          for nom_fichier, id_selection in selections.items():
+              print(f'Traitement de la selection {id_selection} ({nom_fichier})...')
               
-          print(f'{len(objets)} hébergements trouvés dans votre sélection Cantal.')
-          
-          for item in objets:
-              localisation = item.get('localisation', {})
-              geoloc = localisation.get('geolocalisation', {}) if localisation else {}
+              query_structure = {
+                  'apiKey': api_key,
+                  'projetId': int(project_id) if project_id.isdigit() else project_id,
+                  'selectionIds': [int(id_selection)],
+                  'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
+                  'count': 400
+              }
               
-              if geoloc and geoloc.get('valide') is True:
-                  geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
-                  pt = geo_json_data.get('coordinates', []) if geo_json_data else []
-                  
-                  if pt and len(pt) == 2:
-                      try:
-                          lon = float(pt[0]) # Premier index = Longitude
-                          lat = float(pt[1]) # Deuxième index = Latitude
-                          
-                          feature = {
-                              'type': 'Feature',
-                              'geometry': {
-                                  'type': 'Point',
-                                  'coordinates': [lon, lat]
-                              },
-                              'properties': {
-                                  'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                  'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.')
+              try:
+                  response = requests.get(url, params={'query': json.dumps(query_structure)}, headers=headers, timeout=30)
+                  response.raise_for_status()
+                  data = response.json()
+              except Exception as e:
+                  print(f'Erreur sur la selection {id_selection}: {e}')
+                  continue
+              
+              geojson = {'type': 'FeatureCollection', 'features': []}
+              objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
+              
+              for item in objets:
+                  localisation = item.get('localisation', {})
+                  geoloc = localisation.get('geolocalisation', {}) if localisation else {}
+                  if geoloc and geoloc.get('valide') is True:
+                      pt = geoloc.get('geoJson', {}).get('coordinates', [])
+                      if pt and len(pt) == 2:
+                          try:
+                              feature = {
+                                  'type': 'Feature',
+                                  'geometry': {'type': 'Point', 'coordinates': [float(pt[0]), float(pt[1])]},
+                                  'properties': {
+                                      'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
+                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', '')
+                                  }
                               }
-                          }
-                          geojson['features'].append(feature)
-                      except Exception:
-                          continue
-          
-          with open('donnees.geojson', 'w', encoding='utf-8') as f:
-              json.dump(geojson, f, ensure_ascii=False, indent=2)
-          print('Fichier donnees.geojson actualisé avec succès !')
+                              geojson['features'].append(feature)
+                          except:
+                              continue
+              
+              # Sauvegarde un fichier distinct pour chaque catégorie
+              nom_final = f'{nom_fichier}.geojson'
+              with open(nom_final, 'w', encoding='utf-8') as f:
+                  json.dump(geojson, f, ensure_ascii=False, indent=2)
+              print(f'Fichier {nom_final} genere avec {len(geojson[\"features\"])} points.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
         run: |
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
-          git add donnees.geojson
-          git commit -m "Mise à jour des hébergements du Cantal" || echo "Aucune modification"
+          git add *.geojson
+          git commit -m "Mise à jour des 6 catégories d'hébergements" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
