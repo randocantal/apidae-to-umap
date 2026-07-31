@@ -34,7 +34,6 @@ jobs:
           url = 'https://apidae-tourisme.com'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
-          # Vos 6 sélections officielles du Cantal configurées
           config_selections = {
               'hotels': '188585',       
               'campings': '188587',     
@@ -44,14 +43,17 @@ jobs:
               'refuges': '188593'     
           }
           
+          fichier_cree = False
+          
           for nom_fichier, id_sel in config_selections.items():
               print(f'Interrogation de la selection {id_sel} ({nom_fichier})...')
               
+              # Utilisation de @all pour forcer l'envoi de TOUTE la base sans exception
               query_structure = {
                   'apiKey': api_key,
                   'projetId': int(project_id) if project_id.isdigit() else project_id,
                   'selectionIds': [int(id_sel)],
-                  'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation', 'localisation.adresse', 'informations.moyensCommunication'],
+                  'responseFields': ['@all'],
                   'count': 600
               }
               
@@ -79,7 +81,7 @@ jobs:
                               lon = float(pt[0])
                               lat = float(pt[1])
                               
-                              # Reconstruction de l'Adresse
+                              # Extraction robuste de l'adresse
                               adr_data = localisation.get('adresse', {})
                               lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
                               adresse_complete = ', '.join([l for l in lignes if l])
@@ -87,17 +89,26 @@ jobs:
                               if cp_ville:
                                   adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
                               
-                              # Extraction Téléphone, Email et Site Web
+                              # Recherche multi-chemins des moyens de communication
                               tel, email, web = '', '', ''
+                              
+                              # Chemin 1 : Informations générales
                               moyens = item.get('informations', {}).get('moyensCommunication', [])
+                              # Chemin 2 de secours : Dans la structure prestataires / contacts si existante
+                              if not moyens:
+                                  moyens = item.get('localisation', {}).get('contacts', [{}])[0].get('moyensCommunication', [])
+                              
                               for m in moyens:
                                   type_moyen = m.get('type', {}).get('id')
                                   valeur = m.get('coordonnees', {}).get('fr', '')
-                                  if type_moyen == 201:
+                                  if not valeur:
+                                      valeur = m.get('coordonnees', {}).get('en', '')
+                                      
+                                  if type_moyen == 201 or 'tel' in str(m.get('type', {}).get('libelleFr', '')).lower():
                                       tel = valeur
-                                  elif type_moyen == 204:
+                                  elif type_moyen == 204 or 'mail' in str(m.get('type', {}).get('libelleFr', '')).lower():
                                       email = valeur
-                                  elif type_moyen == 205:
+                                  elif type_moyen == 205 or 'site' in str(m.get('type', {}).get('libelleFr', '')).lower() or 'web' in str(m.get('type', {}).get('libelleFr', '')).lower():
                                       web = valeur
                               
                               geojson['features'].append({
@@ -112,10 +123,10 @@ jobs:
                                       'web': web if web else 'Non renseigné'
                                   }
                               })
-                          except:
+                          except Exception as e:
+                              print(f'Erreur objet : {e}')
                               continue
               
-              # Le fichier est généré systématiquement (vide ou plein) pour sécuriser Linux
               with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
               print(f'Fichier {nom_fichier}.geojson genere avec {len(geojson[\"features\"])} points.')
@@ -126,5 +137,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Mise a jour categories enrichies Cantal" || echo "Aucune modification"
+          git commit -m "Mise a jour avec extraction totale des champs" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
