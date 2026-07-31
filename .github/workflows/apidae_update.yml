@@ -2,8 +2,8 @@ name: Actualisation Donnees Apidae
 
 on:
   schedule:
-    - cron: '0 2 * * *' # S'exécute automatiquement toutes les nuits à 2h du matin
-  workflow_dispatch: # Permet de lancer la mise à jour manuellement d'un clic
+    - cron: '0 2 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,8 +25,8 @@ jobs:
           python -c "
           import os, requests, json
           
-          api_key = os.environ.get('APIDAE_API_KEY')
-          project_id = os.environ.get('APIDAE_PROJECT_ID')
+          api_key = os.environ.get('APIDAE_API_KEY', '').strip()
+          project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
           url = 'https://apidae-tourisme.com'
           params = {
@@ -35,41 +35,57 @@ jobs:
               'responseFields': '@all'
           }
           
-          response = requests.get(url, params=params)
-          data = response.json()
+          try:
+              response = requests.get(url, params=params)
+              response.raise_for_status()
+              data = response.json()
+          except Exception as e:
+              print(f'Erreur lors de la requete Apidae : {e}')
+              exit(1)
           
           geojson = {
               'type': 'FeatureCollection',
               'features': []
           }
           
-          for item in data.get('objetsTouristiques', []):
+          # Verification de la presence de donnees
+          objets = data.get('objetsTouristiques', [])
+          if not objets and 'members' in data:
+              objets = data.get('members', [])
+          
+          print(f'{len(objets)} objets trouves dans le flux Apidae.')
+          
+          for item in objets:
               localisation = item.get('localisation', {})
-              geoloc = localisation.get('geolocalisation', {})
+              geoloc = localisation.get('geolocalisation', {}) if localisation else {}
               
               if geoloc and geoloc.get('valide') is True:
-                  geo_json_data = geoloc.get('geoJson', {})
-                  pt = geo_json_data.get('coordinates', [])
+                  geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
+                  pt = geo_json_data.get('coordinates', []) if geo_json_data else []
                   
                   if pt and len(pt) == 2:
-                      lon = float(pt[0])
-                      lat = float(pt[1])
-                      
-                      feature = {
-                          'type': 'Feature',
-                          'geometry': {
-                              'type': 'Point',
-                              'coordinates': [lon, lat]
-                          },
-                          'properties': {
-                              'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                              'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.')
+                      try:
+                          lon = float(pt[0])
+                          lat = float(pt[1])
+                          
+                          feature = {
+                              'type': 'Feature',
+                              'geometry': {
+                                  'type': 'Point',
+                                  'coordinates': [lon, lat]
+                              },
+                              'properties': {
+                                  'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
+                                  'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.')
+                              }
                           }
-                      }
-                      geojson['features'].append(feature)
+                          geojson['features'].append(feature)
+                      except Exception:
+                          continue
           
           with open('donnees.geojson', 'w', encoding='utf-8') as f:
               json.dump(geojson, f, ensure_ascii=False, indent=2)
+          print('Fichier donnees.geojson cree avec succes.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
@@ -77,4 +93,4 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add donnees.geojson
-          git diff --quiet && git diff --staged --quiet || (git commit -m \"Mise à jour des données Apidae\" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Mise à jour des données Apidae" && git push)
