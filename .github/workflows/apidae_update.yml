@@ -31,11 +31,11 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
+          url = 'https://apidae-tourisme.com'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
           # ==========================================================
-          # ⚠️ CONFIGURATION : INSCRIVEZ VOS 6 NUMÉROS DE SÉLECTIONS ICI
+          # CONFIGURATION : GARDEZ BIEN VOS 6 NUMÉROS DE SÉLECTIONS ICI
           # ==========================================================
           config_selections = {
               'hotels': '188585',       # REMPLACEZ 111111 PAR VOTRE 1ER NUMERO
@@ -48,7 +48,6 @@ jobs:
           
           fichier_cree = False
           
-          # Le script boucle individuellement sur chacune de vos sélections pour éviter les blocages
           for nom_fichier, id_sel in config_selections.items():
               id_propre = str(id_sel).strip()
               if id_propre in ['111111', '222222', '333333', '444444', '555555', '666666'] or not id_propre:
@@ -56,28 +55,24 @@ jobs:
                   
               print(f'Interrogation de la selection {id_propre} ({nom_fichier})...')
               
-              # Structure stricte exigée par l'API v002 contenant l'authentification et l'ID de sélection
+              # Ajout des champs adresse et moyensCommunication requis pour extraire contact/web/tel
               query_structure = {
                   'apiKey': api_key,
                   'projetId': int(project_id) if project_id.isdigit() else project_id,
                   'selectionIds': [int(id_propre)],
-                  'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
+                  'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation', 'localisation.adresse', 'informations.moyensCommunication'],
                   'count': 600
               }
               
               try:
                   response = requests.get(url, params={'query': json.dumps(query_structure)}, headers=headers, timeout=45)
                   if response.status_code != 200:
-                      print(f'Erreur serveur {response.status_code} sur {nom_fichier}')
                       continue
                   data = response.json()
-              except Exception as e:
-                  print(f'Impossible de lire le JSON pour {nom_fichier} : {e}')
+              except:
                   continue
                   
               objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
-              print(f' -> {len(objets)} objets trouves.')
-              
               geojson = {'type': 'FeatureCollection', 'features': []}
               
               for item in objets:
@@ -90,29 +85,51 @@ jobs:
                       
                       if pt and len(pt) == 2:
                           try:
-                              lon = float(pt[0]) # Extraction de la Longitude réelle
-                              lat = float(pt[1]) # Extraction de la Latitude réelle
+                              lon = float(pt[0])
+                              lat = float(pt[1])
+                              
+                              # 1. Reconstruction propre de l'Adresse
+                              adr_data = localisation.get('adresse', {})
+                              lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
+                              adresse_complete = ', '.join([l for l in lignes if l])
+                              cp_ville = f\"{adr_data.get('codePostal', '')} {adr_data.get('commune', {}).get('nom', '')}\".strip()
+                              if cp_ville:
+                                  adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
+                              
+                              # 2. Extraction du Téléphone, Email et Site Web
+                              tel, email, web = '', '', ''
+                              moyens = item.get('informations', {}).get('moyensCommunication', [])
+                              for m in moyens:
+                                  type_moyen = m.get('type', {}).get('id')
+                                  valeur = m.get('coordonnees', {}).get('fr', '')
+                                  if type_moyen == 201: # Code officiel Apidae pour Telephone
+                                      tel = valeur
+                                  elif type_moyen == 204: # Code officiel Apidae pour Email
+                                      email = valeur
+                                  elif type_moyen == 205: # Code officiel Apidae pour Site internet
+                                      web = valeur
                               
                               geojson['features'].append({
                                   'type': 'Feature',
                                   'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
                                   'properties': {
                                       'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description.')
+                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description.'),
+                                      'adresse': adresse_complete if adresse_complete else 'Non renseignée',
+                                      'telephone': tel if tel else 'Non renseigné',
+                                      'email': email if email else 'Non renseigné',
+                                      'web': web if web else 'Non renseigné'
                                   }
                               })
                           except:
                               continue
               
-              # Enregistrement du fichier si des objets valides existent
               if geojson['features']:
                   with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                       json.dump(geojson, f, ensure_ascii=False, indent=2)
-                  print(f'Fichier {nom_fichier}.geojson genere avec succes !')
                   fichier_cree = True
           
           if not fichier_cree:
-              print('Aucun fichier n a pu etre genere. Verifiez vos identifiants.')
               exit(1)
           "
 
@@ -121,5 +138,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Mise à jour automatique des 6 catégories d'hébergement" || echo "Aucune modification"
+          git commit -m "Ajout des champs coordonnees et contacts" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
