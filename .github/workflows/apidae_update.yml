@@ -31,24 +31,22 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL officielle technique Apidae v002 pour la recherche par projet
           url = 'https://apidae-tourisme.com'
           
-          # La structure de requête obligatoire (sans apiKey ni projetId à l'intérieur)
+          # TRÈS IMPORTANT : Apidae v002 exige l'apiKey et le projetId à l'intérieur du paramètre 'query'
           query_structure = {
+              'apiKey': api_key,
+              'projetId': int(project_id) if project_id.isdigit() else project_id,
               'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
               'count': 600
           }
           
-          # En v002 GET, tous les éléments d'authentification et la structure doivent être passés en paramètres d'URL
+          # On transmet l'intégralité de la configuration dans une seule chaîne de texte JSON
           params = {
-              'apiKey': api_key,
-              'projetId': project_id,
               'query': json.dumps(query_structure)
           }
           
           try:
-              # Requête GET obligatoire pour cet endpoint
               response = requests.get(url, params=params, timeout=45)
               response.raise_for_status()
               data = response.json()
@@ -82,8 +80,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Correction de l'extraction : index 0 pour Longitude
-                          lat = float(pt[1]) # Correction de l'extraction : index 1 pour Latitude
+                          lon = float(pt[0]) # Premier index = Longitude
+                          lat = float(pt[1]) # Deuxième index = Latitude
                           
                           feature = {
                               'type': 'Feature',
