@@ -31,14 +31,14 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL alternative simplifiée utilisant l'interrogation directe par GET
           url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
           
-          # Encapsulation stricte demandée par la documentation d'Apidae v002
+          # Optimisation majeure : on ne demande QUE les champs requis pour uMap afin d'éviter le 504 Timeout
           query_structure = {
               'projetId': int(project_id) if project_id.isdigit() else project_id,
               'apiKey': api_key,
-              'responseFields': ['@all']
+              'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
+              'count': 200 # Limite initiale de sécurité (augmentez si vous avez plus de points)
           }
           
           params = {
@@ -46,7 +46,7 @@ jobs:
           }
           
           try:
-              response = requests.get(url, params=params)
+              response = requests.get(url, params=params, timeout=30)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
@@ -107,6 +107,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add donnees.geojson
-          # Ajout d'une sécurité d'envoi pour pousser proprement le fichier généré
           git commit -m "Mise à jour des données Apidae" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
