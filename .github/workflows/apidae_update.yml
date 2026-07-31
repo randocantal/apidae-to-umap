@@ -32,7 +32,7 @@ jobs:
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
           # ==========================================
-          # ETAPE DE CONFIGURATION : METTEZ VOS VRAIS NUMEROS ICI
+          # CONFIGURATION DE VOS SÉLECTIONS APIDAE
           # ==========================================
           config_selections = {
               'hotels': '188585',       # REMPLACEZ 111111 PAR VOTRE 1ER NUMERO
@@ -73,12 +73,15 @@ jobs:
                   localisation = item.get('localisation', {})
                   geoloc = localisation.get('geolocalisation', {}) if localisation else {}
                   if geoloc and geoloc.get('valide') is True:
-                      pt = geoloc.get('geoJson', {}).get('coordinates', []) if geoloc else []
+                      geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
+                      pt = geo_json_data.get('coordinates', []) if geo_json_data else []
                       if pt and len(pt) == 2:
                           try:
+                              lon = float(pt[0])
+                              lat = float(pt[1])
                               geojson['features'].append({
                                   'type': 'Feature',
-                                  'geometry': {'type': 'Point', 'coordinates': [float(pt[0]), float(pt[1])]},
+                                  'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
                                   'properties': {
                                       'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
                                       'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', '')
@@ -96,12 +99,11 @@ jobs:
         run: |
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
-          # Securite absolue : on verifie si au moins un fichier a ete cree avant de sauvegarder
           if ls *.geojson 1> /dev/null 2>&1; then
             git add *.geojson
             git commit -m "Generation fiches categories"
             git push origin HEAD:main || git push --force origin HEAD:main
           else
-            print("Aucun fichier geojson n'a pu etre extrait d'Apidae.")
+            echo "Aucun fichier geojson n'a pu etre extrait d'Apidae."
             exit 1
           fi
