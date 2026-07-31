@@ -2,8 +2,8 @@ name: Actualisation Donnees Apidae
 
 on:
   schedule:
-    - cron: '0 2 * * *'
-  workflow_dispatch:
+    - cron: '0 2 * * *' # S'exécute automatiquement toutes les nuits à 2h du matin
+  workflow_dispatch: # Permet de lancer la mise à jour manuellement d'un clic
 
 jobs:
   build:
@@ -28,14 +28,18 @@ jobs:
           python -c "
           import os, requests, json
           
+          # Nettoyage des clés secrètes pour enlever d'éventuels espaces invisibles
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
           url = 'https://apidae-tourisme.com'
+          
+          # Configuration obligatoire exigée par la v002 d'Apidae
           params = {
               'apiKey': api_key,
               'projetId': project_id,
-              'responseFields': '@all'
+              'responseFields': '@all',
+              'query': '{}' # Paramètre obligatoire pour initialiser la recherche v002
           }
           
           try:
@@ -43,7 +47,12 @@ jobs:
               response.raise_for_status()
               data = response.json()
           except Exception as e:
-              print(f'Erreur lors de la requete Apidae : {e}')
+              print('--- ERREUR CRITIQUE DURANT L APPEL APIDAE ---')
+              if 'response' in locals():
+                  print(f'Code serveur : {response.status_code}')
+                  print(f'Contenu renvoye : {response.text[:500]}')
+              else:
+                  print(f'Erreur : {e}')
               exit(1)
           
           geojson = {
@@ -51,11 +60,9 @@ jobs:
               'features': []
           }
           
+          # Apidae stocke les données dans 'objetsTouristiques'
           objets = data.get('objetsTouristiques', [])
-          if not objets and 'members' in data:
-              objets = data.get('members', [])
-          
-          print(f'{len(objets)} objets trouves dans le flux Apidae.')
+          print(f'{len(objets)} objets touristiques trouves dans votre projet.')
           
           for item in objets:
               localisation = item.get('localisation', {})
@@ -87,7 +94,7 @@ jobs:
           
           with open('donnees.geojson', 'w', encoding='utf-8') as f:
               json.dump(geojson, f, ensure_ascii=False, indent=2)
-          print('Fichier donnees.geojson cree avec succes.')
+          print('Fichier donnees.geojson genere et pret !')
           "
 
       - name: Sauvegarder les modifications sur GitHub
