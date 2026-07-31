@@ -75,10 +75,10 @@ jobs:
                       
                       if pt and len(pt) == 2:
                           try:
-                              lon = float(pt)
-                              lat = float(pt)
+                              lon = float(pt[0])
+                              lat = float(pt[1])
                               
-                              # 1. Extraction propre de l'adresse postale
+                              # 1. Extraction d'Adresse v002 standard
                               adr_data = localisation.get('adresse', {})
                               lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
                               adresse_complete = ', '.join([str(l) for l in lignes if l])
@@ -86,9 +86,9 @@ jobs:
                               if cp_ville:
                                   adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
                               
-                              # 2. Extraction ciblée des contacts (Téléphone, Email, Web)
+                              # 2. Extraction des Contacts (moyensCommunication est à la racine de l'objet)
                               tel, email, web = 'Non renseigné', 'Non renseigné', 'Non renseigné'
-                              moyens = item.get('informations', {}).get('moyensCommunication', [])
+                              moyens = item.get('moyensCommunication', [])
                               
                               for m in moyens:
                                   type_id = m.get('type', {}).get('id')
@@ -97,19 +97,17 @@ jobs:
                                       tel = valeur
                                   elif type_id == 204: # Email
                                       email = valeur
-                                  elif type_id == 205: # Site internet
+                                  elif type_id == 205: # Site internet officiel
                                       web = valeur
                               
-                              # 3. Extraction de l'image principale (Visuels)
+                              # 3. Extraction de l'image principale (dans 'illustrations' pour Apidae v002)
                               photo_url = ''
-                              multimedias = item.get('multimedias', [])
-                              for multi in multimedias:
-                                  if multi.get('type') == 'IMAGE_PRINCIPALE' or not photo_url:
-                                      # Récupération de la version de l'image de taille moyenne (traditionnellement 'traductionFr')
-                                      trad = multi.get('traductionFr', {})
-                                      if trad and trad.get('url'):
-                                          photo_url = trad.get('url')
-                                          break
+                              illustrations = item.get('illustrations', [])
+                              if illustrations and isinstance(illustrations, list):
+                                  first_img = illustrations[0]
+                                  trad = first_img.get('traductionFr', {})
+                                  if trad and trad.get('url'):
+                                      photo_url = trad.get('url')
                               
                               geojson['features'].append({
                                   'type': 'Feature',
@@ -129,7 +127,7 @@ jobs:
               
               with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
-              print(f'Fichier {nom_fichier}.geojson genere avec succes.')
+              print(f'Fichier {nom_fichier}.geojson genere.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
@@ -137,5 +135,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Extraction de la photo et des variables de contact" || echo "Aucune modification"
+          git commit -m "Correction technique des chemins Apidae contacts et photos" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
