@@ -32,74 +32,76 @@ jobs:
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
           # ==========================================
-          # ⚠️ METTEZ VOS VRAIS NUMÉROS APIDAE ICI
+          # ETAPE DE CONFIGURATION : METTEZ VOS VRAIS NUMEROS ICI
           # ==========================================
-          selections = {
-              'hotels': 188585,         # Remplacez 111111 par votre 1er numéro de sélection
-              'campings': 188587,       # Remplacez 222222 par votre 2ème numéro
-              'gites-etape_et_sejour': 188586,          # Remplacez 333333 par votre 3ème numéro
-              'chambres_d_hotes': 188589,       # ...
-              'villages_vacances': 188594,
-              'refuges': 188593
+          config_selections = {
+              'hotels': '188585',       # REMPLACEZ 111111 PAR VOTRE 1ER NUMERO
+              'campings': '188587',     # REMPLACEZ 222222 PAR VOTRE 2EME NUMERO
+              'gites_etape_sejour': '188586',        # ...
+              'chambres_hotes': '188589',     
+              'villages_vacance': '188594',
+              'refuges': '188593'
           }
           
           url = 'https://apidae-tourisme.com'
-          headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+          headers = {'User-Agent': 'Mozilla/5.0'}
           
-          for nom_fichier, id_selection in selections.items():
-              print(f'Extraction de la selection {id_selection} ({nom_fichier})...')
+          for nom_fichier, id_sel in config_selections.items():
+              id_propre = str(id_sel).strip().replace('\'', '').replace('\"', '')
+              if not id_propre or id_propre in ['111111', '222222', '333333', '444444', '555555', '666666']:
+                  continue
+                  
+              print(f'Extraction de la selection {id_propre} ({nom_fichier})...')
               
               query_structure = {
                   'apiKey': api_key,
                   'projetId': int(project_id) if project_id.isdigit() else project_id,
-                  'selectionIds': [int(id_selection)],
+                  'selectionIds': [int(id_propre)],
                   'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
                   'count': 600
               }
               
               try:
                   response = requests.get(url, params={'query': json.dumps(query_structure)}, headers=headers, timeout=45)
-                  response.raise_for_status()
                   data = response.json()
-              except Exception as e:
-                  print(f'Erreur technique sur la selection {id_selection}: {e}')
+                  objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
+              except:
                   continue
-              
+                  
               geojson = {'type': 'FeatureCollection', 'features': []}
-              objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
-              
               for item in objets:
                   localisation = item.get('localisation', {})
                   geoloc = localisation.get('geolocalisation', {}) if localisation else {}
                   if geoloc and geoloc.get('valide') is True:
-                      geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
-                      pt = geo_json_data.get('coordinates', []) if geo_json_data else []
+                      pt = geoloc.get('geoJson', {}).get('coordinates', []) if geoloc else []
                       if pt and len(pt) == 2:
                           try:
-                              lon = float(pt[0])
-                              lat = float(pt[1])
-                              feature = {
+                              geojson['features'].append({
                                   'type': 'Feature',
-                                  'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
+                                  'geometry': {'type': 'Point', 'coordinates': [float(pt[0]), float(pt[1])]},
                                   'properties': {
                                       'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description.')
+                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', '')
                                   }
-                              }
-                              geojson['features'].append(feature)
+                              })
                           except:
                               continue
               
-              nom_final = f'{nom_fichier}.geojson'
-              with open(nom_final, 'w', encoding='utf-8') as f:
+              with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
-              print(f'Fichier {nom_final} cree avec succes.')
+              print(f'Fichier {nom_fichier}.geojson cree !')
           "
 
       - name: Sauvegarder les modifications sur GitHub
         run: |
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
-          git add *.geojson
-          git commit -m "Generation des 6 fichiers geojson de categories" || echo "Aucune modification"
-          git push origin HEAD:main || git push --force origin HEAD:main
+          # Securite absolue : on verifie si au moins un fichier a ete cree avant de sauvegarder
+          if ls *.geojson 1> /dev/null 2>&1; then
+            git add *.geojson
+            git commit -m "Generation fiches categories"
+            git push origin HEAD:main || git push --force origin HEAD:main
+          else
+            print("Aucun fichier geojson n'a pu etre extrait d'Apidae.")
+            exit 1
+          fi
