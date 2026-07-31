@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Installation des dependances
+        run: pip install requests
+
       - name: Execution du script de conversion
         env:
           APIDAE_API_KEY: ${{ secrets.APIDAE_API_KEY }}
@@ -48,7 +51,6 @@ jobs:
               'features': []
           }
           
-          # Verification de la presence de donnees
           objets = data.get('objetsTouristiques', [])
           if not objets and 'members' in data:
               objets = data.get('members', [])
