@@ -31,24 +31,20 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL standard v002 de l'API de diffusion d'Apidae
+          # URL v002 officielle de l'API de consultation pour les projets
           url = 'https://apidae-tourisme.com'
           
-          # La configuration structurelle doit être isolée selon les règles d'Apidae
-          query_structure = {
+          # Paramètres requis par le protocole sécurisé v002 d'Apidae
+          payload = {
+              'apiKey': api_key,
+              'projetId': int(project_id) if project_id.isdigit() else project_id,
               'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
               'count': 600
           }
           
-          # Authentification transmise directement en paramètres d'URL obligatoires
-          params = {
-              'apiKey': api_key,
-              'projetId': project_id,
-              'query': json.dumps(query_structure)
-          }
-          
           try:
-              response = requests.get(url, params=params, timeout=45)
+              # L'API de recherche d'Apidae exige une requête POST au format JSON standard
+              response = requests.post(url, json=payload, timeout=45)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
@@ -81,8 +77,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Extraction du premier index pour la Longitude
-                          lat = float(pt[1]) # Extraction du second index pour la Latitude
+                          lon = float(pt[0]) # Longitude (Est / Ouest)
+                          lat = float(pt[1]) # Latitude (Nord / Sud)
                           
                           feature = {
                               'type': 'Feature',
