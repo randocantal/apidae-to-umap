@@ -31,19 +31,23 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL officielle Apidae v002 de recherche par sélection/projet
           url = 'https://apidae-tourisme.com'
           
-          # Les paramètres obligatoires exigés par Apidae v002 en format POST
-          payload = {
-              'apiKey': api_key,
-              'projetId': int(project_id) if project_id.isdigit() else project_id,
+          # Dictionnaire interne exigé par Apidae pour la recherche par projet
+          query_data = {
               'responseFields': ['@all']
           }
           
+          # Format d'envoi requis par la v002 d'Apidae (Formulaire encodé)
+          payload = {
+              'apiKey': api_key,
+              'projetId': project_id,
+              'query': json.dumps(query_data) # La configuration doit obligatoirement être du texte JSON imbriqué
+          }
+          
           try:
-              # Apidae nécessite une requête de type POST pour cette fonction
-              response = requests.post(url, json=payload)
+              # Utilisation de data= pour envoyer les paramètres au format application/x-www-form-urlencoded
+              response = requests.post(url, data=payload)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
