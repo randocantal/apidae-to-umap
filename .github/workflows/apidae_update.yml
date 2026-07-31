@@ -1,0 +1,80 @@
+name: Actualisation Donnees Apidae
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # S'exécute automatiquement toutes les nuits à 2h du matin
+  workflow_dispatch: # Permet de lancer la mise à jour manuellement d'un clic
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du depot
+        uses: actions/checkout@v4
+
+      - name: Configuration de Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Execution du script de conversion
+        env:
+          APIDAE_API_KEY: ${{ secrets.APIDAE_API_KEY }}
+          APIDAE_PROJECT_ID: ${{ secrets.APIDAE_PROJECT_ID }}
+        run: |
+          python -c "
+          import os, requests, json
+          
+          api_key = os.environ.get('APIDAE_API_KEY')
+          project_id = os.environ.get('APIDAE_PROJECT_ID')
+          
+          url = 'https://apidae-tourisme.com'
+          params = {
+              'apiKey': api_key,
+              'projetId': project_id,
+              'responseFields': '@all'
+          }
+          
+          response = requests.get(url, params=params)
+          data = response.json()
+          
+          geojson = {
+              'type': 'FeatureCollection',
+              'features': []
+          }
+          
+          for item in data.get('objetsTouristiques', []):
+              localisation = item.get('localisation', {})
+              geoloc = localisation.get('geolocalisation', {})
+              
+              if geoloc and geoloc.get('valide') is True:
+                  geo_json_data = geoloc.get('geoJson', {})
+                  pt = geo_json_data.get('coordinates', [])
+                  
+                  if pt and len(pt) == 2:
+                      lon = float(pt[0])
+                      lat = float(pt[1])
+                      
+                      feature = {
+                          'type': 'Feature',
+                          'geometry': {
+                              'type': 'Point',
+                              'coordinates': [lon, lat]
+                          },
+                          'properties': {
+                              'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
+                              'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.')
+                          }
+                      }
+                      geojson['features'].append(feature)
+          
+          with open('donnees.geojson', 'w', encoding='utf-8') as f:
+              json.dump(geojson, f, ensure_ascii=False, indent=2)
+          "
+
+      - name: Sauvegarder les modifications sur GitHub
+        run: |
+          git config --global user.name 'Apidae Bot'
+          git config --global user.email 'bot@github.com'
+          git add donnees.geojson
+          git diff --quiet && git diff --staged --quiet || (git commit -m \"Mise à jour des données Apidae\" && git push)
