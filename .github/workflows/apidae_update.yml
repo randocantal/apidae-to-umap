@@ -31,14 +31,14 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL officielle v002 dédiée à la récupération stricte d'une sélection de projet
+          # URL v002 dédiée à la récupération des objets d'une sélection (PROJET)
           url = 'https://apidae-tourisme.com'
           
           query_structure = {
               'projetId': int(project_id) if project_id.isdigit() else project_id,
               'apiKey': api_key,
               'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
-              'count': 500 # Augmenté pour englober tous vos hébergements
+              'count': 600
           }
           
           params = {
@@ -67,7 +67,7 @@ jobs:
           if not objets and 'members' in data:
               objets = data.get('members', [])
               
-          print(f'{len(objets)} hébergements trouvés dans votre sélection Cantal.')
+          print(f'{len(objets)} objets trouves dans votre selection.')
           
           for item in objets:
               localisation = item.get('localisation', {})
@@ -79,8 +79,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Correction : Longitude (index 0)
-                          lat = float(pt[1]) # Correction : Latitude (index 1)
+                          lon = float(pt[0]) # Index 0 = Longitude
+                          lat = float(pt[1]) # Index 1 = Latitude
                           
                           feature = {
                               'type': 'Feature',
@@ -99,7 +99,7 @@ jobs:
           
           with open('donnees.geojson', 'w', encoding='utf-8') as f:
               json.dump(geojson, f, ensure_ascii=False, indent=2)
-          print('Fichier donnees.geojson mis à jour avec votre sélection !')
+          print('Fichier donnees.geojson actualise avec succes !')
           "
 
       - name: Sauvegarder les modifications sur GitHub
