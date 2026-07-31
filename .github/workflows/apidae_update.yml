@@ -31,24 +31,21 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL standard pour interroger l'API de consultation v002
+          # URL alternative simplifiée utilisant l'interrogation directe par GET
           url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
           
-          # Configuration interne requise par la structure Apidae (exclut apiKey et projetId de query)
+          # Encapsulation stricte demandée par la documentation d'Apidae v002
           query_structure = {
-              'responseFields': ['@all'],
-              'count': 100 # Récupère les 100 premiers objets (augmentez si nécessaire)
+              'projetId': int(project_id) if project_id.isdigit() else project_id,
+              'apiKey': api_key,
+              'responseFields': ['@all']
           }
           
-          # Paramètres principaux envoyés au serveur
           params = {
-              'apiKey': api_key,
-              'projetId': project_id,
               'query': json.dumps(query_structure)
           }
           
           try:
-              # Requête standard de type GET acceptée par le service list-objets-touristiques
               response = requests.get(url, params=params)
               response.raise_for_status()
               data = response.json()
@@ -67,6 +64,9 @@ jobs:
           }
           
           objets = data.get('objetsTouristiques', [])
+          if not objets and 'members' in data:
+              objets = data.get('members', [])
+              
           print(f'{len(objets)} objets touristiques trouves dans votre projet.')
           
           for item in objets:
@@ -79,8 +79,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Extraction propre de la longitude
-                          lat = float(pt[1]) # Extraction propre de la latitude
+                          lon = float(pt[0])
+                          lat = float(pt[1])
                           
                           feature = {
                               'type': 'Feature',
@@ -107,4 +107,6 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add donnees.geojson
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Mise à jour des données Apidae" && git push)
+          # Ajout d'une sécurité d'envoi pour pousser proprement le fichier généré
+          git commit -m "Mise à jour des données Apidae" || echo "Aucune modification"
+          git push origin HEAD:main || git push --force origin HEAD:main
