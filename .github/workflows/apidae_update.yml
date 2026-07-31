@@ -35,12 +35,12 @@ jobs:
           # ⚠️ REMPLACEZ LES NUMÉROS CI-DESSOUS PAR VOS VRAIS NUMÉROS APIDAE
           # ==========================================
           selections = {
-              'categorie_1': 188585,  # Mettez le 1er numéro de sélection à la place de 111111
-              'categorie_2': 188586,  # Mettez le 2ème numéro de sélection à la place de 222222
-              'categorie_3': 188587,  # ...
-              'categorie_4': 188589,
-              'categorie_5': 188593,
-              'categorie_6': 188594
+              'HOTELS': 188585,  # Mettez le 1er numéro de sélection à la place de 111111
+              'GITES_ETAPE_ET_SEJOUR': 188586,  # Mettez le 2ème numéro de sélection à la place de 222222
+              'CAMPINGS': 188587,  # ...
+              'CHAMBRES_D_HOTES': 188589,
+              'REFUGES': 188593,
+              'VILLAGES_VACANCES': 188594
           }
           
           url = 'https://apidae-tourisme.com'
