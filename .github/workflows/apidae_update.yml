@@ -66,6 +66,7 @@ jobs:
               geojson = {'type': 'FeatureCollection', 'features': []}
               
               for item in objets:
+                  # Extraction sécurisée des coordonnées géographiques
                   localisation = item.get('localisation', {})
                   geoloc = localisation.get('geolocalisation', {}) if localisation else {}
                   
@@ -74,60 +75,79 @@ jobs:
                       pt = geo_json_data.get('coordinates', []) if geo_json_data else []
                       
                       if pt and len(pt) == 2:
+                          # Valeurs par défaut obligatoires pour éviter le crash du script
+                          adresse_complete = 'Non renseignée'
+                          tel = 'Non renseigné'
+                          email = 'Non renseigné'
+                          web = 'Non renseigné'
+                          photo_url = 'https://website-files.com'
+                          
+                          # 1. Extraction tolérante de l'adresse
                           try:
-                              lon = float(pt[0])
-                              lat = float(pt[1])
-                              
-                              # 1. Extraction d'Adresse v002 standard
                               adr_data = localisation.get('adresse', {})
-                              lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
-                              adresse_complete = ', '.join([str(l) for l in lignes if l])
-                              cp_ville = f\"{adr_data.get('codePostal', '')} {adr_data.get('commune', {}).get('nom', '')}\".strip()
-                              if cp_ville:
-                                  adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
-                              
-                              # 2. Extraction des Contacts (moyensCommunication est à la racine de l'objet)
-                              tel, email, web = 'Non renseigné', 'Non renseigné', 'Non renseigné'
+                              if adr_data:
+                                  lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
+                                  adresse_txt = ', '.join([str(l) for l in lignes if l])
+                                  cp_ville = f\"{adr_data.get('codePostal', '')} {adr_data.get('commune', {}).get('nom', '')}\".strip()
+                                  if cp_ville:
+                                      adresse_complete = f\"{adresse_txt}, {cp_ville}\" if adresse_txt else cp_ville
+                          except:
+                              pass
+                          
+                          # 2. Extraction tolérante des contacts (Vérification multi-chemins)
+                          try:
                               moyens = item.get('moyensCommunication', [])
+                              if not moyens:
+                                  moyens = item.get('informations', {}).get('moyensCommunication', [])
                               
-                              for m in moyens:
-                                  type_id = m.get('type', {}).get('id')
-                                  valeur = m.get('coordonnees', {}).get('fr', '').strip()
-                                  if type_id == 201: # Téléphone
-                                      tel = valeur
-                                  elif type_id == 204: # Email
-                                      email = valeur
-                                  elif type_id == 205: # Site internet officiel
-                                      web = valeur
-                              
-                              # 3. Extraction de l'image principale (dans 'illustrations' pour Apidae v002)
-                              photo_url = ''
+                              if moyens and isinstance(moyens, list):
+                                  for m in moyens:
+                                      type_id = m.get('type', {}).get('id')
+                                      valeur = m.get('coordonnees', {}).get('fr', '').strip()
+                                      if type_id == 201:
+                                          tel = valeur
+                                      elif type_id == 204:
+                                          email = valeur
+                                      elif type_id == 205:
+                                          web = valeur
+                          except:
+                              pass
+                          
+                          # 3. Extraction tolérante de la photo principale
+                          try:
                               illustrations = item.get('illustrations', [])
-                              if illustrations and isinstance(illustrations, list):
-                                  first_img = illustrations[0]
-                                  trad = first_img.get('traductionFr', {})
+                              if illustrations and isinstance(illustrations, list) and len(illustrations) > 0:
+                                  trad = illustrations[0].get('traductionFr', {})
                                   if trad and trad.get('url'):
                                       photo_url = trad.get('url')
-                              
-                              geojson['features'].append({
-                                  'type': 'Feature',
-                                  'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
-                                  'properties': {
-                                      'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.'),
-                                      'adresse': adresse_complete if adresse_complete else 'Non renseignée',
-                                      'telephone': tel,
-                                      'email': email,
-                                      'web': web,
-                                      'photo': photo_url if photo_url else 'https://website-files.com'
-                                  }
-                              })
+                              else:
+                                  # Chemin secondaire de secours (multimedias)
+                                  multimedias = item.get('multimedias', [])
+                                  if multimedias and isinstance(multimedias, list) and len(multimedias) > 0:
+                                      trad = multimedias[0].get('traductionFr', {})
+                                      if trad and trad.get('url'):
+                                          photo_url = trad.get('url')
                           except:
-                              continue
+                              pass
+                          
+                          # Ajout de l'objet dans le GeoJSON final
+                          geojson['features'].append({
+                              'type': 'Feature',
+                              'geometry': {'type': 'Point', 'coordinates': [float(pt[0]), float(pt[1])]},
+                              'properties': {
+                                  'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
+                                  'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.'),
+                                  'adresse': adresse_complete,
+                                  'telephone': tel,
+                                  'email': email,
+                                  'web': web,
+                                  'photo': photo_url
+                              }
+                          })
               
               with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
-              print(f'Fichier {nom_fichier}.geojson genere.')
+              print(f'Fichier {nom_fichier}.geojson genere avec {len(geojson[\"features\"])} points.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
@@ -135,5 +155,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Correction technique des chemins Apidae contacts et photos" || echo "Aucune modification"
+          git commit -m "Extraction finale contact et photo avec securite anti-crash" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
