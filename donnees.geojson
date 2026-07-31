@@ -1,0 +1,1489 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.59518,
+          46.393811
+        ]
+      },
+      "properties": {
+        "name": "Tennis club Evian",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.21672,
+          45.175713
+        ]
+      },
+      "properties": {
+        "name": "Atelier des bons oeuvriers",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.170587,
+          44.241642
+        ]
+      },
+      "properties": {
+        "name": "Patrice Dussourd",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.584929,
+          46.400888
+        ]
+      },
+      "properties": {
+        "name": "Société anonyme des eaux minérales evian",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.713177,
+          46.390034
+        ]
+      },
+      "properties": {
+        "name": "Yannick Lelievre",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.716208,
+          46.390844
+        ]
+      },
+      "properties": {
+        "name": "Pressing Laverie",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.6767,
+          46.366
+        ]
+      },
+      "properties": {
+        "name": "Artisanat TAILLEUR DE COLOMBES - Edelweiss",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.951859,
+          44.65137
+        ]
+      },
+      "properties": {
+        "name": "Exploitant forestier Galligot",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.674862,
+          46.359488
+        ]
+      },
+      "properties": {
+        "name": "EGLISE ST OURS",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.731124,
+          46.352972
+        ]
+      },
+      "properties": {
+        "name": "LA DENT D'OCHE",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.966468,
+          44.575541
+        ]
+      },
+      "properties": {
+        "name": "M. Delenne Rémi et Léa",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.696886,
+          46.194121
+        ]
+      },
+      "properties": {
+        "name": "Vétérinaire Montriond",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.8043,
+          46.393
+        ]
+      },
+      "properties": {
+        "name": "Association des Amis du Musée des Traditions et des Barques du Léman",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.125456,
+          45.00359
+        ]
+      },
+      "properties": {
+        "name": "Trans'Oisans",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.955335,
+          44.651095
+        ]
+      },
+      "properties": {
+        "name": "Court tennis",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.954648,
+          44.65079
+        ]
+      },
+      "properties": {
+        "name": "La Poste - Agence communale",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.960522,
+          44.65116
+        ]
+      },
+      "properties": {
+        "name": "D.D.E. St Etienne",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.955335,
+          44.651095
+        ]
+      },
+      "properties": {
+        "name": "Assurances Groupama",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          3.970287,
+          44.606824
+        ]
+      },
+      "properties": {
+        "name": "La Poste - Agence communale",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.04375,
+          44.398675
+        ]
+      },
+      "properties": {
+        "name": "Domaine Gigondan",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.81278,
+          44.422167
+        ]
+      },
+      "properties": {
+        "name": "DOMAINE ROZEL",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.916688,
+          44.423599
+        ]
+      },
+      "properties": {
+        "name": "M. AUREL - LA RABASSIERE",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.774486,
+          44.431639
+        ]
+      },
+      "properties": {
+        "name": "DOMAINE DE GRANGENEUVE",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.06071,
+          44.418299
+        ]
+      },
+      "properties": {
+        "name": "Domaine de la Bouvaude",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.267119,
+          44.269192
+        ]
+      },
+      "properties": {
+        "name": "DELARUELLE Jacqueline et Jean-Pierre",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.276468,
+          44.266444
+        ]
+      },
+      "properties": {
+        "name": "Xavier et Élodie Aumage",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.405774,
+          45.238251
+        ]
+      },
+      "properties": {
+        "name": "Sanctuaire Notre-Dame de l'Osier",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.221608,
+          46.193654
+        ]
+      },
+      "properties": {
+        "name": "Centre diocésain",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.909201,
+          44.419466
+        ]
+      },
+      "properties": {
+        "name": "Galerie Roue Libre",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.925386,
+          45.566855
+        ]
+      },
+      "properties": {
+        "name": "Maison des Associations",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.456795,
+          45.59608
+        ]
+      },
+      "properties": {
+        "name": "Aventure Sensation",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.051438,
+          45.140747
+        ]
+      },
+      "properties": {
+        "name": "Montagnes de l'Oisans",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          2.361895,
+          48.851425
+        ]
+      },
+      "properties": {
+        "name": "Centre des Monuments Nationaux",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.595931,
+          44.869704
+        ]
+      },
+      "properties": {
+        "name": "Parcours Aventure Trièves",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.224206,
+          45.596343
+        ]
+      },
+      "properties": {
+        "name": "Tennis club",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.938541,
+          44.420635
+        ]
+      },
+      "properties": {
+        "name": "Debard Sylvie - Taxi",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.405147,
+          45.238344
+        ]
+      },
+      "properties": {
+        "name": "Foyer Rural",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.178123,
+          45.903532
+        ]
+      },
+      "properties": {
+        "name": "Musée du Vieux Pérouges",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.756941,
+          45.42186
+        ]
+      },
+      "properties": {
+        "name": "Chartreuse - Chartreuse Guiers",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.995831,
+          46.365854
+        ]
+      },
+      "properties": {
+        "name": "Vuillermoz Michaël",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.180643,
+          45.903053
+        ]
+      },
+      "properties": {
+        "name": "Restaurant Les Terrasses de Pérouges",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.806406,
+          46.246527
+        ]
+      },
+      "properties": {
+        "name": "Les Archers des Hautes Combes",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.93784,
+          46.43144
+        ]
+      },
+      "properties": {
+        "name": "Pont-de-Vaux et son territoire",
+        "description": "Fait partie de la communauté de communes Bresse et Saône"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.978898,
+          44.443338
+        ]
+      },
+      "properties": {
+        "name": "Commune de Taulignan",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.771228,
+          45.872727
+        ]
+      },
+      "properties": {
+        "name": "Auberge de Chasselay",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.593943,
+          45.366162
+        ]
+      },
+      "properties": {
+        "name": "Vélo Touriste Voironnais",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.822818,
+          46.15065
+        ]
+      },
+      "properties": {
+        "name": "Mairie de Confort",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.162028,
+          45.746275
+        ]
+      },
+      "properties": {
+        "name": "Communauté de communes Lyon Saint Exupéry en Dauphiné",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.556039,
+          46.027073
+        ]
+      },
+      "properties": {
+        "name": "Mairie de Saint Cyr le Châtoux",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.683951,
+          45.875726
+        ]
+      },
+      "properties": {
+        "name": "Mairie de Saint Jean des Vignes",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.227405,
+          46.206126
+        ]
+      },
+      "properties": {
+        "name": "Paroisse Notre-Dame",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.214524,
+          46.187691
+        ]
+      },
+      "properties": {
+        "name": "Centre culturel - Peronnas",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.868353,
+          46.223204
+        ]
+      },
+      "properties": {
+        "name": "Mairie",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.584258,
+          46.401025
+        ]
+      },
+      "properties": {
+        "name": "Minigolf",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.05829,
+          46.336149
+        ]
+      },
+      "properties": {
+        "name": "Pays de Gex Promotion Animation",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.788663,
+          44.900732
+        ]
+      },
+      "properties": {
+        "name": "Athlétic Club Matheysin",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.61647,
+          45.940214
+        ]
+      },
+      "properties": {
+        "name": "Mairie de Theizé",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.742321,
+          44.878847
+        ]
+      },
+      "properties": {
+        "name": "Le Domaine des Genevreys",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.475489,
+          45.385239
+        ]
+      },
+      "properties": {
+        "name": "Communauté de communes de Bièvre Est",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.826348,
+          46.109247
+        ]
+      },
+      "properties": {
+        "name": "Chorale la Villanelle",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.230448,
+          45.620752
+        ]
+      },
+      "properties": {
+        "name": "Porte des Alpes - CAPI",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.610877,
+          45.674494
+        ]
+      },
+      "properties": {
+        "name": "Un Dimanche à la Campagne",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.81249,
+          46.122815
+        ]
+      },
+      "properties": {
+        "name": "Restos du Coeur",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.903818,
+          46.140399
+        ]
+      },
+      "properties": {
+        "name": "Mairie",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.774623,
+          46.05992
+        ]
+      },
+      "properties": {
+        "name": "Football Club Injoux-Génissiat",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.74245,
+          44.878178
+        ]
+      },
+      "properties": {
+        "name": "Le Pellenfrey - JP Analoro",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.265234,
+          45.801794
+        ]
+      },
+      "properties": {
+        "name": "Centrale nucléaire du Bugey EDF",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.322978,
+          46.212415
+        ]
+      },
+      "properties": {
+        "name": "Boffet Jacques",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.821444,
+          45.968252
+        ]
+      },
+      "properties": {
+        "name": "MAISON MOLLEX",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.656328,
+          46.261908
+        ]
+      },
+      "properties": {
+        "name": "Association Sportive ASA-ESCA-PLASTICS-VALLEE",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.791697,
+          44.901318
+        ]
+      },
+      "properties": {
+        "name": "Piscine Aqua Mira",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.576524,
+          46.184688
+        ]
+      },
+      "properties": {
+        "name": "Auberge du Charron",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.339843,
+          45.96011
+        ]
+      },
+      "properties": {
+        "name": "Syndicat intercommunal du centre nautique Bugey Côtière",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.3277,
+          46.101576
+        ]
+      },
+      "properties": {
+        "name": "Rando Saint Martin",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.272439,
+          46.204319
+        ]
+      },
+      "properties": {
+        "name": "Entente Athlétique Bressane",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.206565,
+          46.186324
+        ]
+      },
+      "properties": {
+        "name": "Diam's Club",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.314323,
+          46.18344
+        ]
+      },
+      "properties": {
+        "name": "L'Ordre de la Grappe d'Or",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.489664,
+          44.229625
+        ]
+      },
+      "properties": {
+        "name": "SARL École de parapente des Baronnies",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.131857,
+          45.0362
+        ]
+      },
+      "properties": {
+        "name": "Syndicat d'Initiative Mont de Lans Les 2 Alpes 1300",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.560492,
+          45.857463
+        ]
+      },
+      "properties": {
+        "name": "Karting Evasion",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.828724,
+          45.866712
+        ]
+      },
+      "properties": {
+        "name": "Lyon Nord",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.967301,
+          45.004525
+        ]
+      },
+      "properties": {
+        "name": "Ecole du Ski Français",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.885721,
+          45.314077
+        ]
+      },
+      "properties": {
+        "name": "ESF des Petites Roches",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.368122,
+          46.323516
+        ]
+      },
+      "properties": {
+        "name": "Château La Tour de Marignan",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.744759,
+          44.958079
+        ]
+      },
+      "properties": {
+        "name": "Club Amateurs Mécaniques Anciennes et Sportives",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.020549,
+          44.901613
+        ]
+      },
+      "properties": {
+        "name": "Comité des Fêtes",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.121555,
+          46.332068
+        ]
+      },
+      "properties": {
+        "name": "Les écuries du Rosey",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.532963,
+          45.955172
+        ]
+      },
+      "properties": {
+        "name": "Vallée de l'Albarine : Vallée à sensations",
+        "description": "Dédiée à la nature, dans un écrin de verdure, la Vallée de l’Albarine est une étape incontournable pour vivre vos sensations : sports de plein air, calme, contemplation, émotions pour tous ; sportifs, pêcheurs, familles, individuels, groupes d’amis…"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.956208,
+          46.118436
+        ]
+      },
+      "properties": {
+        "name": "Châtillon-sur-Chalaronne et ses environs Dombes",
+        "description": "Châtillon-sur-Chalaronne et ses environs Dombes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.825379,
+          46.106056
+        ]
+      },
+      "properties": {
+        "name": "Terre Valserhône",
+        "description": "Au confluent du Rhône et de la Valserine, du Plateau de Retord à la Haute-Chaîne du Jura, le pays bellegardien vous offre une variété de paysages exceptionnels, au centre d'une zone d'attractions touristiques incontestées."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.678348,
+          45.904506
+        ]
+      },
+      "properties": {
+        "name": "Valromey -  Retord -  Grand Colombier",
+        "description": "Tout près des sommets alpins, le sud des Montagnes du Jura se distinguent par ses paysages à la fois tranquilles et mouvementés où alternent prairies, chemins buissonniers, combes et crêts. Les villages du Valromey se révèlent à qui veut bien s'aventurer"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.285351,
+          44.236933
+        ]
+      },
+      "properties": {
+        "name": "PAESEN Agnès et Jean",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.41731,
+          46.159503
+        ]
+      },
+      "properties": {
+        "name": "Comité d'animation",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.598104,
+          46.393729
+        ]
+      },
+      "properties": {
+        "name": "Manège Equi-Libre",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.916386,
+          45.686578
+        ]
+      },
+      "properties": {
+        "name": "Société des accordéonistes aixois",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.944434,
+          45.660773
+        ]
+      },
+      "properties": {
+        "name": "Comité des fêtes",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.471923,
+          45.708267
+        ]
+      },
+      "properties": {
+        "name": "Les Amis du Marché",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.270465,
+          44.273539
+        ]
+      },
+      "properties": {
+        "name": "Mairie",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.029107,
+          46.002114
+        ]
+      },
+      "properties": {
+        "name": "Centre Dombes",
+        "description": "Idéalement situé au cœur du pays aux mille étangs, le territoire Centre Dombes offre des paysages variés et originaux. \r\nLes très nombreux étangs (plus de 1200 étangs sur la Dombes, la plupart étant situés au centre de la Dombes) en font son originalité."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.213253,
+          45.055054
+        ]
+      },
+      "properties": {
+        "name": "Refuge Les Mouterres - Stéphanie Thomasson",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.947644,
+          45.794801
+        ]
+      },
+      "properties": {
+        "name": "Pays d'Albens",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.947552,
+          45.862012
+        ]
+      },
+      "properties": {
+        "name": "Rumilly-Albanais",
+        "description": "Laissez-vous aller ! Vous êtes à Rumilly-Albanais, la destination qui ouvre sur toutes les évasions et mène à toutes les émotions !"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          5.914829,
+          45.68851
+        ]
+      },
+      "properties": {
+        "name": "Aix-les-Bains",
+        "description": "Aix-les-Bains et le lac du Bourget, un territoire riche et surprenant. Au bord du plus grand lac naturel de France, labellisé France station nautique, Aix les Bains accueille petits et grands toute l’année dans un décor unique entre lac et montagnes."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.007846,
+          45.373827
+        ]
+      },
+      "properties": {
+        "name": "Centre équestre la Balzane",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          6.123686,
+          45.918353
+        ]
+      },
+      "properties": {
+        "name": "Ville d'Annecy - Direction de la Culture",
+        "description": "Aucune description disponible."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          4.447021,
+          45.636671
+        ]
+      },
+      "properties": {
+        "name": "CC Monts du Lyonnais",
+        "description": "La Communauté de communes des Monts du Lyonnais (CCMDL) est issue de la fusion des Communautés de communes de Chamousset en Lyonnais et des Hauts du Lyonnais au 1er janvier 2017."
+      }
+    }
+  ]
+}
