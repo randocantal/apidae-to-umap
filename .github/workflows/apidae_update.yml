@@ -31,23 +31,25 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          url = 'https://apidae-tourisme.com'
+          # URL standard pour interroger l'API de consultation v002
+          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
           
-          # Dictionnaire interne exigé par Apidae pour la recherche par projet
-          query_data = {
-              'responseFields': ['@all']
+          # Configuration interne requise par la structure Apidae (exclut apiKey et projetId de query)
+          query_structure = {
+              'responseFields': ['@all'],
+              'count': 100 # Récupère les 100 premiers objets (augmentez si nécessaire)
           }
           
-          # Format d'envoi requis par la v002 d'Apidae (Formulaire encodé)
-          payload = {
+          # Paramètres principaux envoyés au serveur
+          params = {
               'apiKey': api_key,
               'projetId': project_id,
-              'query': json.dumps(query_data) # La configuration doit obligatoirement être du texte JSON imbriqué
+              'query': json.dumps(query_structure)
           }
           
           try:
-              # Utilisation de data= pour envoyer les paramètres au format application/x-www-form-urlencoded
-              response = requests.post(url, data=payload)
+              # Requête standard de type GET acceptée par le service list-objets-touristiques
+              response = requests.get(url, params=params)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
@@ -77,8 +79,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0])
-                          lat = float(pt[1])
+                          lon = float(pt[0]) # Extraction propre de la longitude
+                          lat = float(pt[1]) # Extraction propre de la latitude
                           
                           feature = {
                               'type': 'Feature',
