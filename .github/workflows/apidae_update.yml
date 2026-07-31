@@ -26,12 +26,12 @@ jobs:
           APIDAE_PROJECT_ID: ${{ secrets.APIDAE_PROJECT_ID }}
         run: |
           python -c "
-          import os, requests, json, re
+          import os, requests, json
           
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
+          url = 'https://apidae-tourisme.com'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
           config_selections = {
@@ -78,7 +78,7 @@ jobs:
                               lon = float(pt)
                               lat = float(pt)
                               
-                              # 1. Extraction d'Adresse stabilisée
+                              # 1. Extraction propre de l'adresse postale
                               adr_data = localisation.get('adresse', {})
                               lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
                               adresse_complete = ', '.join([str(l) for l in lignes if l])
@@ -86,20 +86,30 @@ jobs:
                               if cp_ville:
                                   adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
                               
-                              # 2. Méthode Aspirateur : On cherche les contacts dans TOUT l'objet converti en texte brut
-                              texte_brut_objet = json.dumps(item, ensure_ascii=False)
+                              # 2. Extraction ciblée des contacts (Téléphone, Email, Web)
+                              tel, email, web = 'Non renseigné', 'Non renseigné', 'Non renseigné'
+                              moyens = item.get('informations', {}).get('moyensCommunication', [])
                               
-                              tels_trouves = re.findall(r'(?:0[1-9](?:\s*\d{2}){4}|\+33\s*[1-9](?:\s*\d{2}){4})', texte_brut_objet)
-                              emails_trouves = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', texte_brut_objet)
-                              webs_trouves = re.findall(r'https?://(?:www\.)?[\w\.-]+\.\w+(?:/[\w\.-]*)*', texte_brut_objet)
+                              for m in moyens:
+                                  type_id = m.get('type', {}).get('id')
+                                  valeur = m.get('coordonnees', {}).get('fr', '').strip()
+                                  if type_id == 201: # Téléphone
+                                      tel = valeur
+                                  elif type_id == 204: # Email
+                                      email = valeur
+                                  elif type_id == 205: # Site internet
+                                      web = valeur
                               
-                              # Filtrage pour éviter les faux-positifs du serveur Apidae
-                              tels_propres = [t for t in tels_trouves if not t.startswith('000')]
-                              webs_propres = [w for w in webs_trouves if 'apidae-tourisme' not in w and 'website-files' not in w]
-                              
-                              tel = tels_propres[0] if tels_propres else 'Non renseigné'
-                              email = emails_trouves[0] if emails_trouves else 'Non renseigné'
-                              web = webs_propres[0] if webs_propres else 'Non renseigné'
+                              # 3. Extraction de l'image principale (Visuels)
+                              photo_url = ''
+                              multimedias = item.get('multimedias', [])
+                              for multi in multimedias:
+                                  if multi.get('type') == 'IMAGE_PRINCIPALE' or not photo_url:
+                                      # Récupération de la version de l'image de taille moyenne (traditionnellement 'traductionFr')
+                                      trad = multi.get('traductionFr', {})
+                                      if trad and trad.get('url'):
+                                          photo_url = trad.get('url')
+                                          break
                               
                               geojson['features'].append({
                                   'type': 'Feature',
@@ -110,10 +120,11 @@ jobs:
                                       'adresse': adresse_complete if adresse_complete else 'Non renseignée',
                                       'telephone': tel,
                                       'email': email,
-                                      'web': web
+                                      'web': web,
+                                      'photo': photo_url if photo_url else 'https://website-files.com'
                                   }
                               })
-                          except Exception as e:
+                          except:
                               continue
               
               with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
@@ -126,5 +137,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Extraction universelle des contacts" || echo "Aucune modification"
+          git commit -m "Extraction de la photo et des variables de contact" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
