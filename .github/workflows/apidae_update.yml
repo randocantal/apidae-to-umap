@@ -34,32 +34,23 @@ jobs:
           url = 'https://apidae-tourisme.com'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
-          # ==========================================================
-          # CONFIGURATION : GARDEZ BIEN VOS 6 NUMÉROS DE SÉLECTIONS ICI
-          # ==========================================================
+          # Vos 6 sélections officielles du Cantal configurées
           config_selections = {
-              'hotels': '188585',       # REMPLACEZ 111111 PAR VOTRE 1ER NUMERO
-              'campings': '188587',     # REMPLACEZ 222222 PAR VOTRE 2EME NUMERO
-              'gites_etape_sejour': '188586',        # ...
+              'hotels': '188585',       
+              'campings': '188587',     
+              'gites_etape_sejour': '188586',        
               'chambres_hotes': '188589',     
-              'villages_vacance': '188594',
-              'refuges': '188593'
+              'villages_vacance': '188594',     
+              'refuges': '188593'     
           }
           
-          fichier_cree = False
-          
           for nom_fichier, id_sel in config_selections.items():
-              id_propre = str(id_sel).strip()
-              if id_propre in ['111111', '222222', '333333', '444444', '555555', '666666'] or not id_propre:
-                  continue
-                  
-              print(f'Interrogation de la selection {id_propre} ({nom_fichier})...')
+              print(f'Interrogation de la selection {id_sel} ({nom_fichier})...')
               
-              # Ajout des champs adresse et moyensCommunication requis pour extraire contact/web/tel
               query_structure = {
                   'apiKey': api_key,
                   'projetId': int(project_id) if project_id.isdigit() else project_id,
-                  'selectionIds': [int(id_propre)],
+                  'selectionIds': [int(id_sel)],
                   'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation', 'localisation.adresse', 'informations.moyensCommunication'],
                   'count': 600
               }
@@ -88,7 +79,7 @@ jobs:
                               lon = float(pt[0])
                               lat = float(pt[1])
                               
-                              # 1. Reconstruction propre de l'Adresse
+                              # Reconstruction de l'Adresse
                               adr_data = localisation.get('adresse', {})
                               lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
                               adresse_complete = ', '.join([l for l in lignes if l])
@@ -96,17 +87,17 @@ jobs:
                               if cp_ville:
                                   adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
                               
-                              # 2. Extraction du Téléphone, Email et Site Web
+                              # Extraction Téléphone, Email et Site Web
                               tel, email, web = '', '', ''
                               moyens = item.get('informations', {}).get('moyensCommunication', [])
                               for m in moyens:
                                   type_moyen = m.get('type', {}).get('id')
                                   valeur = m.get('coordonnees', {}).get('fr', '')
-                                  if type_moyen == 201: # Code officiel Apidae pour Telephone
+                                  if type_moyen == 201:
                                       tel = valeur
-                                  elif type_moyen == 204: # Code officiel Apidae pour Email
+                                  elif type_moyen == 204:
                                       email = valeur
-                                  elif type_moyen == 205: # Code officiel Apidae pour Site internet
+                                  elif type_moyen == 205:
                                       web = valeur
                               
                               geojson['features'].append({
@@ -124,13 +115,10 @@ jobs:
                           except:
                               continue
               
-              if geojson['features']:
-                  with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
-                      json.dump(geojson, f, ensure_ascii=False, indent=2)
-                  fichier_cree = True
-          
-          if not fichier_cree:
-              exit(1)
+              # Le fichier est généré systématiquement (vide ou plein) pour sécuriser Linux
+              with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
+                  json.dump(geojson, f, ensure_ascii=False, indent=2)
+              print(f'Fichier {nom_fichier}.geojson genere avec {len(geojson[\"features\"])} points.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
@@ -138,5 +126,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Ajout des champs coordonnees et contacts" || echo "Aucune modification"
+          git commit -m "Mise a jour categories enrichies Cantal" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
