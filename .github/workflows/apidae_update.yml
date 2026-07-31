@@ -31,23 +31,25 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
+          # URL v002 officielle de l'API de consultation
           url = 'https://apidae-tourisme.com'
           
-          # TRÈS IMPORTANT : Apidae v002 exige l'apiKey et le projetId à l'intérieur du paramètre 'query'
+          # Structure technique requise à l'intérieur du paramètre query
           query_structure = {
-              'apiKey': api_key,
-              'projetId': int(project_id) if project_id.isdigit() else project_id,
               'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
               'count': 600
           }
           
-          # On transmet l'intégralité de la configuration dans une seule chaîne de texte JSON
-          params = {
+          # Paramètres transmis au format de formulaire requis par Apidae
+          payload = {
+              'apiKey': api_key,
+              'projetId': project_id,
               'query': json.dumps(query_structure)
           }
           
           try:
-              response = requests.get(url, params=params, timeout=45)
+              # Utilisation du paramètre data= pour forcer l'envoi en formulaire encodé (POST)
+              response = requests.post(url, data=payload, timeout=45)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
@@ -68,7 +70,7 @@ jobs:
           if not objets and 'members' in data:
               objets = data.get('members', [])
               
-          print(f'{len(objets)} objets trouves dans votre projet Apidae.')
+          print(f'{len(objets)} hébergements trouvés dans votre sélection Cantal.')
           
           for item in objets:
               localisation = item.get('localisation', {})
@@ -80,8 +82,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Premier index = Longitude
-                          lat = float(pt[1]) # Deuxième index = Latitude
+                          lon = float(pt[0]) # Extraction Longitude
+                          lat = float(pt[1]) # Extraction Latitude
                           
                           feature = {
                               'type': 'Feature',
@@ -100,7 +102,7 @@ jobs:
           
           with open('donnees.geojson', 'w', encoding='utf-8') as f:
               json.dump(geojson, f, ensure_ascii=False, indent=2)
-          print('Fichier donnees.geojson actualise avec succes !')
+          print('Fichier donnees.geojson actualisé avec succès !')
           "
 
       - name: Sauvegarder les modifications sur GitHub
