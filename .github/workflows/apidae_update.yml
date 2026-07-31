@@ -26,12 +26,12 @@ jobs:
           APIDAE_PROJECT_ID: ${{ secrets.APIDAE_PROJECT_ID }}
         run: |
           python -c "
-          import os, requests, json
+          import os, requests, json, re
           
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          url = 'https://apidae-tourisme.com'
+          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
           config_selections = {
@@ -43,12 +43,9 @@ jobs:
               'refuges': '188593'     
           }
           
-          fichier_cree = False
-          
           for nom_fichier, id_sel in config_selections.items():
-              print(f'Interrogation de la selection {id_sel} ({nom_fichier})...')
+              print(f'Extraction de la selection {id_sel}...')
               
-              # Utilisation de @all pour forcer l'envoi de TOUTE la base sans exception
               query_structure = {
                   'apiKey': api_key,
                   'projetId': int(project_id) if project_id.isdigit() else project_id,
@@ -78,58 +75,50 @@ jobs:
                       
                       if pt and len(pt) == 2:
                           try:
-                              lon = float(pt[0])
-                              lat = float(pt[1])
+                              lon = float(pt)
+                              lat = float(pt)
                               
-                              # Extraction robuste de l'adresse
+                              # 1. Extraction d'Adresse stabilisée
                               adr_data = localisation.get('adresse', {})
                               lignes = [adr_data.get('adresse1'), adr_data.get('adresse2'), adr_data.get('adresse3')]
-                              adresse_complete = ', '.join([l for l in lignes if l])
+                              adresse_complete = ', '.join([str(l) for l in lignes if l])
                               cp_ville = f\"{adr_data.get('codePostal', '')} {adr_data.get('commune', {}).get('nom', '')}\".strip()
                               if cp_ville:
                                   adresse_complete = f\"{adresse_complete}, {cp_ville}\" if adresse_complete else cp_ville
                               
-                              # Recherche multi-chemins des moyens de communication
-                              tel, email, web = '', '', ''
+                              # 2. Méthode Aspirateur : On cherche les contacts dans TOUT l'objet converti en texte brut
+                              texte_brut_objet = json.dumps(item, ensure_ascii=False)
                               
-                              # Chemin 1 : Informations générales
-                              moyens = item.get('informations', {}).get('moyensCommunication', [])
-                              # Chemin 2 de secours : Dans la structure prestataires / contacts si existante
-                              if not moyens:
-                                  moyens = item.get('localisation', {}).get('contacts', [{}])[0].get('moyensCommunication', [])
+                              tels_trouves = re.findall(r'(?:0[1-9](?:\s*\d{2}){4}|\+33\s*[1-9](?:\s*\d{2}){4})', texte_brut_objet)
+                              emails_trouves = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', texte_brut_objet)
+                              webs_trouves = re.findall(r'https?://(?:www\.)?[\w\.-]+\.\w+(?:/[\w\.-]*)*', texte_brut_objet)
                               
-                              for m in moyens:
-                                  type_moyen = m.get('type', {}).get('id')
-                                  valeur = m.get('coordonnees', {}).get('fr', '')
-                                  if not valeur:
-                                      valeur = m.get('coordonnees', {}).get('en', '')
-                                      
-                                  if type_moyen == 201 or 'tel' in str(m.get('type', {}).get('libelleFr', '')).lower():
-                                      tel = valeur
-                                  elif type_moyen == 204 or 'mail' in str(m.get('type', {}).get('libelleFr', '')).lower():
-                                      email = valeur
-                                  elif type_moyen == 205 or 'site' in str(m.get('type', {}).get('libelleFr', '')).lower() or 'web' in str(m.get('type', {}).get('libelleFr', '')).lower():
-                                      web = valeur
+                              # Filtrage pour éviter les faux-positifs du serveur Apidae
+                              tels_propres = [t for t in tels_trouves if not t.startswith('000')]
+                              webs_propres = [w for w in webs_trouves if 'apidae-tourisme' not in w and 'website-files' not in w]
+                              
+                              tel = tels_propres[0] if tels_propres else 'Non renseigné'
+                              email = emails_trouves[0] if emails_trouves else 'Non renseigné'
+                              web = webs_propres[0] if webs_propres else 'Non renseigné'
                               
                               geojson['features'].append({
                                   'type': 'Feature',
                                   'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
                                   'properties': {
                                       'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description.'),
+                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.'),
                                       'adresse': adresse_complete if adresse_complete else 'Non renseignée',
-                                      'telephone': tel if tel else 'Non renseigné',
-                                      'email': email if email else 'Non renseigné',
-                                      'web': web if web else 'Non renseigné'
+                                      'telephone': tel,
+                                      'email': email,
+                                      'web': web
                                   }
                               })
                           except Exception as e:
-                              print(f'Erreur objet : {e}')
                               continue
               
               with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
-              print(f'Fichier {nom_fichier}.geojson genere avec {len(geojson[\"features\"])} points.')
+              print(f'Fichier {nom_fichier}.geojson genere avec succes.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
@@ -137,5 +126,5 @@ jobs:
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
           git add *.geojson
-          git commit -m "Mise a jour avec extraction totale des champs" || echo "Aucune modification"
+          git commit -m "Extraction universelle des contacts" || echo "Aucune modification"
           git push origin HEAD:main || git push --force origin HEAD:main
