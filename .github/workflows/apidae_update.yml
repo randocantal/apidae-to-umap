@@ -31,25 +31,29 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # URL v002 officielle de l'API de consultation
-          url = 'https://apidae-tourisme.com'
+          # URL v002 officielle de l'API de consultation de diffusion
+          url = 'https://api.apidae-tourisme.com/api/v002/recherche/list-objets-touristiques'
           
-          # Structure technique requise à l'intérieur du paramètre query
+          # Structure technique stricte exigée en v002 : l'authentification s'imbrique obligatoirement DANS la query
           query_structure = {
+              'apiKey': api_key,
+              'projetId': int(project_id) if project_id.isdigit() else project_id,
               'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
               'count': 600
           }
           
-          # Paramètres transmis au format de formulaire requis par Apidae
-          payload = {
-              'apiKey': api_key,
-              'projetId': project_id,
+          params = {
               'query': json.dumps(query_structure)
           }
           
+          # En-tête de sécurité pour imiter un navigateur réel et éviter le blocage de la passerelle OpenResty
+          headers = {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          }
+          
           try:
-              # Utilisation du paramètre data= pour forcer l'envoi en formulaire encodé (POST)
-              response = requests.post(url, data=payload, timeout=45)
+              # Appel en méthode GET pure avec en-têtes appropriés
+              response = requests.get(url, params=params, headers=headers, timeout=45)
               response.raise_for_status()
               data = response.json()
           except Exception as e:
@@ -82,8 +86,8 @@ jobs:
                   
                   if pt and len(pt) == 2:
                       try:
-                          lon = float(pt[0]) # Extraction Longitude
-                          lat = float(pt[1]) # Extraction Latitude
+                          lon = float(pt[0]) # Premier index = Longitude
+                          lat = float(pt[1]) # Deuxième index = Latitude
                           
                           feature = {
                               'type': 'Feature',
