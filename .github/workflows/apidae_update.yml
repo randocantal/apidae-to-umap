@@ -20,7 +20,7 @@ jobs:
       - name: Installation des dependances
         run: pip install requests
 
-      - name: Execution du script de conversion multi-selections
+      - name: Execution du script de conversion
         env:
           APIDAE_API_KEY: ${{ secrets.APIDAE_API_KEY }}
           APIDAE_PROJECT_ID: ${{ secrets.APIDAE_PROJECT_ID }}
@@ -31,79 +31,92 @@ jobs:
           api_key = os.environ.get('APIDAE_API_KEY', '').strip()
           project_id = os.environ.get('APIDAE_PROJECT_ID', '').strip()
           
-          # ==========================================
-          # CONFIGURATION DE VOS SÉLECTIONS APIDAE
-          # ==========================================
-          config_selections = {
-              'hotels': '188585',       # REMPLACEZ 111111 PAR VOTRE 1ER NUMERO
-              'campings': '188587',     # REMPLACEZ 222222 PAR VOTRE 2EME NUMERO
-              'gites_etape_sejour': '188586',        # ...
-              'chambres_hotes': '188589',     
-              'villages_vacance': '188594',
-              'refuges': '188593'
+          url = 'https://apidae-tourisme.com'
+          
+          # On aspire TOUT le projet à 4 chiffres d'un seul coup (jusqu'à 1500 objets)
+          query_structure = {
+              'apiKey': api_key,
+              'projetId': int(project_id) if project_id.isdigit() else project_id,
+              'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation', 'caracteristiques.categories'],
+              'count': 1500
           }
           
-          url = 'https://apidae-tourisme.com'
           headers = {'User-Agent': 'Mozilla/5.0'}
           
-          for nom_fichier, id_sel in config_selections.items():
-              id_propre = str(id_sel).strip().replace('\'', '').replace('\"', '')
-              if not id_propre or id_propre in ['111111', '222222', '333333', '444444', '555555', '666666']:
-                  continue
+          try:
+              response = requests.get(url, params={'query': json.dumps(query_structure)}, headers=headers, timeout=60)
+              response.raise_for_status()
+              data = response.json()
+          except Exception as e:
+              print(f'Erreur API: {e}')
+              exit(1)
+          
+          objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
+          print(f'{len(objets)} objets au total trouves dans le projet.')
+          
+          # Dictionnaires de tri par types Apidae officiels
+          categories = {
+              'hotels': [],
+              'campings': [],
+              'gites_meubles': [],
+              'chambres_hotes': [],
+              'villages_vacances': [],
+              'insolites_autres': []
+          }
+          
+          for item in objets:
+              localisation = item.get('localisation', {})
+              geoloc = localisation.get('geolocalisation', {}) if localisation else {}
+              
+              if geoloc and geoloc.get('valide') is True:
+                  geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
+                  pt = geo_json_data.get('coordinates', []) if geo_json_data else []
                   
-              print(f'Extraction de la selection {id_propre} ({nom_fichier})...')
-              
-              query_structure = {
-                  'apiKey': api_key,
-                  'projetId': int(project_id) if project_id.isdigit() else project_id,
-                  'selectionIds': [int(id_propre)],
-                  'responseFields': ['id', 'nom', 'presentation.descriptifCourt', 'localisation.geolocalisation'],
-                  'count': 600
-              }
-              
-              try:
-                  response = requests.get(url, params={'query': json.dumps(query_structure)}, headers=headers, timeout=45)
-                  data = response.json()
-                  objets = data.get('objetsTouristiques', []) if data.get('objetsTouristiques') else data.get('members', [])
-              except:
-                  continue
-                  
-              geojson = {'type': 'FeatureCollection', 'features': []}
-              for item in objets:
-                  localisation = item.get('localisation', {})
-                  geoloc = localisation.get('geolocalisation', {}) if localisation else {}
-                  if geoloc and geoloc.get('valide') is True:
-                      geo_json_data = geoloc.get('geoJson', {}) if geoloc else {}
-                      pt = geo_json_data.get('coordinates', []) if geo_json_data else []
-                      if pt and len(pt) == 2:
-                          try:
-                              lon = float(pt[0])
-                              lat = float(pt[1])
-                              geojson['features'].append({
-                                  'type': 'Feature',
-                                  'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
-                                  'properties': {
-                                      'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
-                                      'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', '')
-                                  }
-                              })
-                          except:
-                              continue
-              
-              with open(f'{nom_fichier}.geojson', 'w', encoding='utf-8') as f:
+                  if pt and len(pt) == 2:
+                      try:
+                          lon = float(pt[0])
+                          lat = float(pt[1])
+                          
+                          feature = {
+                              'type': 'Feature',
+                              'geometry': {'type': 'Point', 'coordinates': [lon, lat]},
+                              'properties': {
+                                  'name': item.get('nom', {}).get('libelleFr', 'Sans nom'),
+                                  'description': item.get('presentation', {}).get('descriptifCourt', {}).get('libelleFr', 'Aucune description disponible.')
+                              }
+                          }
+                          
+                          # Tri automatique selon la nature de l'objet dans Apidae
+                          types = [c.get('id') for c in item.get('caracteristiques', {}).get('categories', []) if c.get('id')]
+                          
+                          # Identification des catégories (Hotels, Campings, Meublés, Chambres...)
+                          if any(t in [649, 659, 1378] for t in types):
+                              categories['hotels'].append(feature)
+                          elif any(t in [648, 1318, 1435] for t in types):
+                              categories['campings'].append(feature)
+                          elif any(t in [615, 650, 1876] for t in types):
+                              categories['gites_meubles'].append(feature)
+                          elif any(t in [662, 1361] for t in types):
+                              categories['chambres_hotes'].append(feature)
+                          elif any(t in [656, 1269, 1289] for t in types):
+                              categories['villages_vacances'].append(feature)
+                          else:
+                              categories['insolites_autres'].append(feature)
+                      except:
+                          continue
+          
+          # Generation des 6 fichiers distincts
+          for nom_cat, liste_features in categories.items():
+              geojson = {'type': 'FeatureCollection', 'features': liste_features}
+              with open(f'{nom_cat}.geojson', 'w', encoding='utf-8') as f:
                   json.dump(geojson, f, ensure_ascii=False, indent=2)
-              print(f'Fichier {nom_fichier}.geojson cree !')
+              print(f'Fichier {nom_cat}.geojson cree avec {len(liste_features)} points.')
           "
 
       - name: Sauvegarder les modifications sur GitHub
         run: |
           git config --global user.name 'Apidae Bot'
           git config --global user.email 'bot@github.com'
-          if ls *.geojson 1> /dev/null 2>&1; then
-            git add *.geojson
-            git commit -m "Generation fiches categories"
-            git push origin HEAD:main || git push --force origin HEAD:main
-          else
-            echo "Aucun fichier geojson n'a pu etre extrait d'Apidae."
-            exit 1
-          fi
+          git add *.geojson
+          git commit -m "Mise à jour automatique des 6 catégories d'hébergement" || echo "Aucune modification"
+          git push origin HEAD:main || git push --force origin HEAD:main
